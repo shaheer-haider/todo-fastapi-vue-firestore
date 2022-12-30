@@ -1,0 +1,3 @@
+gcloud container clusters get-credentials todo-kub-cluster --zone us-central1-a --project learning123gcp
+
+kubectl set image deployment/todo-kub-cluster todo-kub=us-docker.pkg.dev/learning123gcp/todo-app/todo-app

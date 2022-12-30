@@ -1,0 +1,36 @@
+steps:
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args: ["auth", "configure-docker", "us-docker.pkg.dev"]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "-t",
+        "us-docker.pkg.dev/learning123gcp/todo-app/todo-app:$BRANCH_NAME-$SHORT_SHA",
+        ".",
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+
+    args: ["push", "us-docker.pkg.dev/learning123gcp/todo-app/todo-app:$BRANCH_NAME-$SHORT_SHA"]
+
+  - name: "gcr.io/cloud-builders/kubectl"
+    args:
+      [
+        "set",
+        "image",
+        "deployment",
+        "todo-kub",
+        "todo-app-sha256-1=us-docker.pkg.dev/learning123gcp/todo-app/todo-app:$BRANCH_NAME-$SHORT_SHA",
+      ]
+    env:
+      - "CLOUDSDK_COMPUTE_ZONE=us-central1-a"
+      - "CLOUDSDK_CONTAINER_CLUSTER=todo-kub-cluster"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+
+
+# kubectl set image deployment todo-kub todo-app-sha256-1=us-docker.pkg.dev/learning123gcp/todo-app/todo-app:latest
